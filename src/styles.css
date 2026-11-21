@@ -200,9 +200,8 @@ mark { background: none; color: inherit; }
 /* Thai needs air above and below for tone marks and vowels; negative tracking breaks clusters */
 :lang(th) body { line-height: 1.7; }
 :lang(th) .hand { letter-spacing: 0; }
-:lang(th) .hero__title { line-height: 1.16; font-size: clamp(2rem, 8.5vw, 4.4rem); letter-spacing: 0; }
-.hero__title .line > span { white-space: nowrap; }
-@media (min-width: 1040px) { :lang(th) .hero__title { font-size: min(4.4rem, 3.9vw); } }
+:lang(th) .hero__title { line-height: 1.16; font-size: clamp(1.8rem, 7.5vw, 4.2rem); letter-spacing: 0; }
+@media (min-width: 1040px) { :lang(th) .hero__title { font-size: min(3rem, 3.6vw); } }
 .btn, .lang { white-space: nowrap; }
 :lang(th) .js .hero__title .line, .is-th.js .hero__title .line { overflow-clip-margin: .45em; padding-top: .08em; }
 :lang(th) .section__title { line-height: 1.18; letter-spacing: 0; font-size: clamp(2.1rem, 8.6vw, 3.7rem); }
@@ -245,12 +244,12 @@ mark { background: none; color: inherit; }
 .sticker__stars svg { width: 16px; height: 16px; }
 
 .hero__title {
-  font-size: clamp(2.5rem, 10.7vw, 7.4rem);
+  font-size: clamp(2.3rem, 9.6vw, 7.4rem);
   line-height: .92; letter-spacing: -.045em;
   display: grid;
 }
 .hero__title .line { display: block; position: relative; padding-bottom: .04em; }
-.hero__title .line > span { display: inline-block; }
+.hero__title .line > span { display: inline-block; max-width: 100%; overflow-wrap: break-word; }
 .line--mark { color: var(--red); width: fit-content; }
 .scribble { position: absolute; left: -2%; bottom: -.12em; width: 104%; height: .26em; }
 .scribble path { fill: none; stroke: var(--leaf); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 320; stroke-dashoffset: 320; }
@@ -362,7 +361,8 @@ mark { background: none; color: inherit; }
   :root { --header-h: 76px; --gut: 40px; }
   .hero { padding: 20px 0 90px; min-height: calc(100svh - var(--header-h)); display: grid; align-content: center; }
   .hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 48px; }
-  .hero__title { font-size: min(6.3rem, 5.5vw); }
+  .hero__title { font-size: min(4rem, 4.5vw); }
+  .hero__copy { min-width: 0; }
   .hero__art { min-height: 640px; }
   .hero__polas { inset: 170px 0 0; }
   .hero__polas .pola { width: 46%; max-width: 290px; }
