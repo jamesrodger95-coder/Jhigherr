@@ -1,0 +1,74 @@
+{
+  "og-storefront": {
+    "w": 1200,
+    "h": 1600
+  },
+  "og-sign": {
+    "w": 1600,
+    "h": 2133
+  },
+  "og-jars-wall": {
+    "w": 1080,
+    "h": 1440
+  },
+  "og-counter-notes": {
+    "w": 1600,
+    "h": 2133
+  },
+  "og-interior": {
+    "w": 1477,
+    "h": 1108
+  },
+  "og-shelves": {
+    "w": 1600,
+    "h": 2133
+  },
+  "og-jars": {
+    "w": 1080,
+    "h": 1440
+  },
+  "og-door": {
+    "w": 1600,
+    "h": 2133
+  },
+  "og-polaroids": {
+    "w": 1600,
+    "h": 2844
+  },
+  "lounge-night": {
+    "w": 1600,
+    "h": 2133
+  },
+  "lounge-seating": {
+    "w": 1600,
+    "h": 2133
+  },
+  "lounge-door": {
+    "w": 1600,
+    "h": 2133
+  },
+  "lounge-shelves": {
+    "w": 1600,
+    "h": 2133
+  },
+  "lounge-counter": {
+    "w": 1080,
+    "h": 1440
+  },
+  "lounge-interior": {
+    "w": 1600,
+    "h": 2133
+  },
+  "lounge-bar": {
+    "w": 1600,
+    "h": 2133
+  },
+  "lounge-bag": {
+    "w": 1600,
+    "h": 2133
+  },
+  "lounge-buds": {
+    "w": 1125,
+    "h": 828
+  }
+}
