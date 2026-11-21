@@ -7,6 +7,62 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hasIO = 'IntersectionObserver' in window;
 
+  /* ---------- language (EN / TH) ---------- */
+  var TH = /*@th*/{};
+  var STR = {
+    en: {
+      open: 'Open now · until midnight', closing: 'Open now · closes at midnight',
+      today: 'Closed · opens today at 8AM', tomorrow: 'Closed · opens tomorrow at 8AM', day: 'Closed · opens {d} at 8AM', closed: 'Closed',
+      days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      anyOpen: 'Open right now. Between our two shops, we’re here every day from 8AM to midnight.',
+      anyClosed: 'Closed for the night. We open again at 8AM, and you can still message us on LINE.',
+      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      store: { 1: 'The OG Place', 2: 'The Lounge' }, yearOffset: 0, toggle: 'อ่านเป็นภาษาไทย'
+    },
+    th: {
+      open: 'เปิดอยู่ · ถึงเที่ยงคืน', closing: 'เปิดอยู่ · ใกล้ปิดแล้ว (เที่ยงคืน)',
+      today: 'ปิดอยู่ · เปิดวันนี้ 8 โมงเช้า', tomorrow: 'ปิดอยู่ · เปิดพรุ่งนี้ 8 โมงเช้า', day: 'ปิดอยู่ · เปิดวัน{d} 8 โมงเช้า', closed: 'ปิด',
+      days: ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'],
+      anyOpen: 'ตอนนี้ร้านเปิดอยู่ สองสาขาของเราเปิดทุกวัน 08:00–24:00',
+      anyClosed: 'ตอนนี้ร้านปิดแล้ว เปิดอีกครั้ง 8 โมงเช้า แต่ทัก LINE ทิ้งไว้ได้เลย',
+      months: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
+      store: { 1: 'ร้านแรก ซอย 63', 2: 'เลานจ์ ซอย 65' }, yearOffset: 543, toggle: 'Switch to English'
+    }
+  };
+  var lang = h.lang === 'th' ? 'th' : 'en';
+  var EN = {}, ENA = {};
+  function applyLang(l, save) {
+    lang = l;
+    h.lang = l;
+    h.classList.toggle('is-th', l === 'th');
+    $$('[data-i18n]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n');
+      if (!(k in EN)) EN[k] = el.innerHTML;
+      var v = l === 'th' ? TH[k] : EN[k];
+      if (v != null && el.innerHTML !== v) el.innerHTML = v;
+    });
+    $$('[data-i18n-aria]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-aria');
+      if (!(k in ENA)) ENA[k] = el.getAttribute('aria-label');
+      var v = l === 'th' ? TH[k] : ENA[k];
+      if (v != null) el.setAttribute('aria-label', v);
+    });
+    var S = STR[l];
+    $$('[data-lang-toggle]').forEach(function (b) { b.setAttribute('aria-label', S.toggle); });
+    $$('.rv__meta[data-ym]').forEach(function (el) {
+      var p = el.getAttribute('data-ym').split('-');
+      el.textContent = S.months[+p[1] - 1] + ' ' + (+p[0] + S.yearOffset) + ' · ' + S.store[el.getAttribute('data-store')];
+    });
+    if (save) { try { localStorage.setItem('jh-lang', l); } catch (e) {} }
+    if (hoursReady) paintHours();
+  }
+  var hoursReady = false;
+  if (lang === 'th') applyLang('th');
+  $$('[data-lang-toggle]').forEach(function (b) {
+    b.setAttribute('aria-label', STR[lang].toggle);
+    b.addEventListener('click', function () { applyLang(lang === 'th' ? 'en' : 'th', true); });
+  });
+
   /* ---------- age gate ---------- */
   var gate = $('.gate');
   function start() {
@@ -42,19 +98,15 @@
     } catch (e) { var n = new Date(); return { day: n.getDay(), mins: n.getHours() * 60 + n.getMinutes() }; }
   }
   var OPEN = 8 * 60, CLOSE = 24 * 60;
-  var DAY = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   function shopState(days, t) {
-    var openToday = days.indexOf(t.day) > -1;
-    if (openToday && t.mins >= OPEN && t.mins < CLOSE) {
-      var left = CLOSE - t.mins;
-      return { open: true, text: left <= 60 ? 'Open now · closing soon (midnight)' : 'Open now · until midnight' };
-    }
-    if (openToday && t.mins < OPEN) return { open: false, text: 'Closed · opens today at 8AM' };
+    var S = STR[lang], openToday = days.indexOf(t.day) > -1;
+    if (openToday && t.mins >= OPEN && t.mins < CLOSE) return { open: true, text: CLOSE - t.mins <= 60 ? S.closing : S.open };
+    if (openToday && t.mins < OPEN) return { open: false, text: S.today };
     for (var i = 1; i <= 7; i++) {
       var nd = (t.day + i) % 7;
-      if (days.indexOf(nd) > -1) return { open: false, text: 'Closed · opens ' + (i === 1 ? 'tomorrow' : DAY[nd]) + ' at 8AM' };
+      if (days.indexOf(nd) > -1) return { open: false, text: i === 1 ? S.tomorrow : S.day.replace('{d}', S.days[nd]) };
     }
-    return { open: false, text: 'Closed' };
+    return { open: false, text: S.closed };
   }
   function paintHours() {
     var t = bkkNow(), anyOpen = false;
@@ -74,11 +126,10 @@
     var dot = $('[data-open-dot]'), any = $('[data-open-any]');
     if (dot && any) {
       dot.classList.toggle('is-open', anyOpen);
-      any.textContent = anyOpen
-        ? 'Open right now — and between our two shops, every day 8AM – midnight.'
-        : 'Closed for the night — back at 8AM. You can still message us on LINE.';
+      any.textContent = anyOpen ? STR[lang].anyOpen : STR[lang].anyClosed;
     }
   }
+  hoursReady = true;
   paintHours();
   setInterval(paintHours, 60000);
 

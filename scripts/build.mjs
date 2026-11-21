@@ -73,11 +73,11 @@ const stars = '<svg><use href="#i-star"/></svg>'.repeat(5);
 function review(r) {
   const [y, m] = r.date.split('-');
   return `<article class="rv" data-store="${r.store}">
-<header class="rv__head"><span class="rv__av" style="--h:${hue(r.name)}" aria-hidden="true">${esc(initials(r.name))}</span><div><p class="rv__name">${esc(r.name)}</p><span class="rv__meta">${MONTHS[+m - 1]} ${y} · ${STORE[r.store]}</span></div></header>
+<header class="rv__head"><span class="rv__av" style="--h:${hue(r.name)}" aria-hidden="true">${esc(initials(r.name))}</span><div><p class="rv__name">${esc(r.name)}</p><span class="rv__meta" data-ym="${y}-${m}" data-store="${r.store}">${MONTHS[+m - 1]} ${y} · ${STORE[r.store]}</span></div></header>
 <div class="rv__stars" role="img" aria-label="Rated ${r.rating} out of 5">${stars}</div>
-<p class="rv__text">${esc(r.text).replace(/\n+/g, '<br>')}</p>
-${r.reply ? `<p class="rv__reply"><strong>Jack Higher replied</strong>${esc(r.reply)}</p>` : ''}
-<a class="rv__link" href="${esc(r.url)}" target="_blank" rel="noopener nofollow">View on Google<svg class="ico" aria-hidden="true"><use href="#i-ext"/></svg></a>
+<p class="rv__text" lang="en">${esc(r.text).replace(/\n+/g, '<br>')}</p>
+${r.reply ? `<p class="rv__reply" lang="en"><strong data-i18n="rv_reply">Jack Higher replied</strong>${esc(r.reply)}</p>` : ''}
+<a class="rv__link" href="${esc(r.url)}" target="_blank" rel="noopener nofollow"><span data-i18n="rv_view">View on Google</span><svg class="ico" aria-hidden="true"><use href="#i-ext"/></svg></a>
 </article>`;
 }
 
@@ -109,15 +109,20 @@ function jsonld() {
 }
 
 /* ---------- assemble ---------- */
-const [tpl, css, js, sprite, icons, qr, reviews] = await Promise.all([
+const [tpl, css, js, sprite, icons, qr, reviews, th] = await Promise.all([
   read(src('index.html')), read(src('styles.css')), read(src('app.js')),
   read(src('partials/sprite.svg')), read(src('partials/icons.svg')), read(src('partials/line-qr.svg')),
-  read(src('data/reviews.json')).then(JSON.parse),
+  read(src('data/reviews.json')).then(JSON.parse), read(src('data/th.json')).then(JSON.parse),
 ]);
+
+// every data-i18n key in the page must have a Thai string (catches typos before they ship)
+const keys = new Set([...tpl.matchAll(/data-i18n(?:-aria)?="([^"]+)"/g)].map((m) => m[1]).concat(['rv_view', 'rv_reply']));
+const missing = [...keys].filter((k) => !(k in th));
+if (missing.length) throw new Error(`Missing Thai strings: ${missing.join(', ')}`);
 
 let html = tpl
   .replace('<!-- @css -->', () => minifyCss(css))
-  .replace('<!-- @js -->', () => minifyJs(js))
+  .replace('<!-- @js -->', () => minifyJs(js.replace('/*@th*/{}', () => JSON.stringify(th))))
   .replace('<!-- @sprite -->', () => minifySvg(sprite))
   .replace('<!-- @icons -->', () => minifySvg(icons))
   .replaceAll('<!-- @qr -->', () => minifySvg(qr))

@@ -53,6 +53,11 @@ Short links that work once deployed: `/line`, `/review`, `/ig`. They're handy fo
 | Reviews shown | `src/data/reviews.json` |
 | Photos | Put originals in a folder, edit `PHOTOS` in `scripts/optimize-images.py`, then run `python3 scripts/optimize-images.py <folder>` |
 | Colours / type | CSS custom properties at the top of `src/styles.css` |
+| Thai copy | `src/data/th.json` (English lives in the HTML; the build fails if a key has no Thai string) |
+
+## Languages (EN / ไทย)
+
+Every visible string has a `data-i18n="key"`. English is the HTML itself and Thai comes from `src/data/th.json`. The toggle sits in the header, the age gate and the footer. The language is picked in this order: `?lang=th` / `?lang=en` in the URL, then the visitor's last choice, then their phone's language. Thai uses Mali (display) and Noto Sans Thai (text), and browsers only download them when Thai is on screen.
 
 ## Analytics
 
